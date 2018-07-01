@@ -130,9 +130,9 @@
             this.groupBox2.Controls.Add(this.button2);
             this.groupBox2.Controls.Add(this.radioButton1);
             this.groupBox2.Controls.Add(this.radioButton2);
-            this.groupBox2.Location = new System.Drawing.Point(454, 8);
+            this.groupBox2.Location = new System.Drawing.Point(480, 8);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(143, 429);
+            this.groupBox2.Size = new System.Drawing.Size(117, 429);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
