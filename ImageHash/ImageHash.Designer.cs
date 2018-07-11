@@ -52,12 +52,10 @@
             // chooseImageDialog
             // 
             this.chooseImageDialog.FileName = "chooseImageDialog";
-            this.chooseImageDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.chooseImageDialog_FileOk);
             // 
             // saveAsDialog
             // 
             this.saveAsDialog.Filter = "Text files|*.txt|All files|*.*";
-            this.saveAsDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog_FileOk);
             // 
             // richTextBox1
             // 
@@ -66,14 +64,15 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox1.Location = new System.Drawing.Point(14, 13);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(460, 424);
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(460, 429);
             this.richTextBox1.TabIndex = 1;
             this.richTextBox1.Text = "";
             // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button1.Location = new System.Drawing.Point(14, 450);
+            this.button1.Location = new System.Drawing.Point(14, 455);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(147, 42);
             this.button1.TabIndex = 0;
@@ -84,7 +83,7 @@
             // button2
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button2.Location = new System.Drawing.Point(12, 383);
+            this.button2.Location = new System.Drawing.Point(12, 388);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(92, 34);
             this.button2.TabIndex = 2;
@@ -126,14 +125,15 @@
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(608, 505);
+            this.groupBox1.Size = new System.Drawing.Size(608, 510);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             // 
             // checkBox1
             // 
+            this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(248, 464);
+            this.checkBox1.Location = new System.Drawing.Point(248, 469);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(226, 17);
             this.checkBox1.TabIndex = 4;
@@ -152,14 +152,14 @@
             this.groupBox2.Controls.Add(this.radioButton2);
             this.groupBox2.Location = new System.Drawing.Point(480, 8);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(117, 429);
+            this.groupBox2.Size = new System.Drawing.Size(117, 434);
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             // 
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.button3.Location = new System.Drawing.Point(12, 343);
+            this.button3.Location = new System.Drawing.Point(12, 348);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(92, 34);
             this.button3.TabIndex = 3;
@@ -175,7 +175,7 @@
             this.groupBox3.Controls.Add(this.pictureBox1);
             this.groupBox3.Location = new System.Drawing.Point(626, 12);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(563, 505);
+            this.groupBox3.Size = new System.Drawing.Size(563, 510);
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             // 
@@ -186,7 +186,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1.Location = new System.Drawing.Point(6, 13);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(548, 486);
+            this.pictureBox1.Size = new System.Drawing.Size(548, 491);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 5;
             this.pictureBox1.TabStop = false;
@@ -195,13 +195,12 @@
             // 
             this.openFileDialog.FileName = "txt file";
             this.openFileDialog.Filter = "Txt Files|*.txt|All files|*.*";
-            this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
             // 
             // ImageHash
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1201, 529);
+            this.ClientSize = new System.Drawing.Size(1201, 534);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox3);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

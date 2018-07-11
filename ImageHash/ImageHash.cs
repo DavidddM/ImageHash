@@ -16,7 +16,7 @@ namespace ImageHash
     {
         public bool binary = false;
         public bool AutoType = false;
-        public readonly string bArrDelim = " ";
+        Img Img = null;
 
         public ImageHash()
         {
@@ -26,146 +26,73 @@ namespace ImageHash
         #region button-clicks
         private void ChooseImage(object sender, EventArgs e)
         {
-            chooseImageDialog.ShowDialog();
+            if(chooseImageDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    Img = new Img(Image.FromFile(chooseImageDialog.FileName));
+                    richTextBox1.Text = binary ? String.Join(Img.BDELIM, Img.ByteArray) : Img.Base64String;
+                    pictureBox1.Image = Img.Image;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("An error has occured. Make sure that you've selected valid file and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
         private void SaveAs(object sender, EventArgs e)
         {
-            saveAsDialog.ShowDialog();
+            if (saveAsDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if (binary) Img.SaveByteArray(saveAsDialog.FileName);
+                    else Img.SaveBase64String(saveAsDialog.FileName);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("An error has occured. Make sure that the image has successfully been loaded.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
         private void OpenFile(object sender, EventArgs e)
         {
-            openFileDialog.ShowDialog();
-        }
-        #endregion
-
-        #region load-image
-        public void LoadImage()
-        {
-            try
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                pictureBox1.Load(chooseImageDialog.FileName);
-                richTextBox1.Text = "Loading..";
-                Thread th = new Thread(() => { UpdateGUI(GetBArr(chooseImageDialog.FileName), binary); });
-                th.Start();
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("An error has occured. Invalid image file.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        public void LoadImage(string str)
-        {
-            if (AutoType)
-            {
-                if (IsByteArray(str))
+                try
                 {
-                    binary = true;
-                    radioButton1.Checked = true;
+                    if (!AutoType)
+                    {
+                        if (binary) { Img = Img.FromByteArray(openFileDialog.FileName); }
+                        else { Img = Img.FromBase64String(openFileDialog.FileName, true); }
+                    }
+                    else
+                    {
+                        using (StreamReader sr = new StreamReader(openFileDialog.FileName))
+                        {
+                            string tempStr = sr.ReadToEnd();
+                            if (Img.IsByteArray(tempStr))
+                            {
+                                Img = Img.FromByteArray(Img.FromStringToByteArray(tempStr));
+                                radioButton1.Checked = true;
+                                binary = true;
+                            }
+                            else
+                            {
+                                Img = Img.FromBase64String(tempStr, false);
+                                radioButton2.Checked = true;
+                                binary = false;
+                            }
+                        }
+                    }
+                    pictureBox1.Image = Img.Image;
+                    richTextBox1.Text = binary ? String.Join(Img.BDELIM, Img.ByteArray) : Img.Base64String;
                 }
-                else
+                catch(Exception ex)
                 {
-                    binary = false;
-                    radioButton2.Checked = true;
+                    MessageBox.Show("An error has occured. Make sure that you've selected valid file type and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            try
-            {
-                byte[] bArr = binary ? FromStringToBARR(str) : Convert.FromBase64String(str);
-                Image image;
-                using (MemoryStream ms = new MemoryStream(bArr))
-                {
-                    image = Image.FromStream(ms);
-                }
-
-                pictureBox1.Image = image;
-            }
-
-            catch (Exception)
-            {
-                MessageBox.Show("Given file isn't in correct format", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                richTextBox1.Text = "";
-                pictureBox1.Image = null;
-                return;
-            }
-            
-        }
-        #endregion
-
-        #region save/load richtext
-        public void SaveRichText(string fileName)
-        {
-            using (StreamWriter sw = new StreamWriter(fileName))
-            {
-                sw.Write(richTextBox1.Text);
-            }
-        }
-
-        public void LoadRichText(string filePath)
-        {
-            using (StreamReader sr = new StreamReader(filePath))
-            {
-                string str = sr.ReadToEnd();
-                richTextBox1.Text = str;
-                LoadImage(str);
-            }
-        }
-        #endregion
-
-        #region file-dialogs
-        private void saveFileDialog_FileOk(object sender, CancelEventArgs e)
-        {
-            SaveRichText(saveAsDialog.FileName);
-        }
-
-        private void openFileDialog_FileOk(object sender, CancelEventArgs e)
-        {
-            LoadRichText(openFileDialog.FileName);
-        }
-
-        private void chooseImageDialog_FileOk(object sender, CancelEventArgs e)
-        {
-            LoadImage();
-        }
-        #endregion
-
-        #region helper-methods
-        private void UpdateGUI(byte[] bArr, bool binary)
-        {
-            string richtext = "";
-            richtext = binary ? String.Join(bArrDelim, bArr) : Convert.ToBase64String(bArr);
-            richTextBox1.Text = richtext;
-        }
-
-        private byte[] GetBArr(object fileName)
-        {
-            Image img = Image.FromFile(fileName.ToString());
-            MemoryStream memoryStream = new MemoryStream();
-            img.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Png);
-            byte[] byteArr = memoryStream.ToArray();
-
-            return byteArr;
-        }
-
-        public byte[] FromStringToBARR(string str)
-        {
-            string[] sArr = str.Split(bArrDelim.ToCharArray());
-            byte[] bArr = new byte[sArr.Length];
-
-            for (int i = 0; i < sArr.Length; i++)
-            {
-                bArr[i] = Convert.ToByte(sArr[i]);
-            }
-
-            return bArr;
-        }
-
-        public bool IsByteArray(string str)
-        {
-            foreach(var c in str.Replace(" ", String.Empty))
-            {
-                if (!Int32.TryParse(c.ToString(), out int n)) return false;
-            }
-            return true;
         }
         #endregion
 
@@ -175,7 +102,7 @@ namespace ImageHash
             if (binary) return;
             binary = true;
             if (richTextBox1.Text.Equals("")) return;
-            richTextBox1.Text = String.Join(bArrDelim, Convert.FromBase64String(richTextBox1.Text));
+            richTextBox1.Text = String.Join(Img.BDELIM, Img.ByteArray);
         }
 
         private void radioButton2_Click(object sender, EventArgs e)
@@ -183,7 +110,7 @@ namespace ImageHash
             if (!binary) return;
             binary = false;
             if (richTextBox1.Text.Equals("")) return;
-            richTextBox1.Text = Convert.ToBase64String(FromStringToBARR(richTextBox1.Text));
+            richTextBox1.Text = Img.Base64String;
         }
         #endregion
 
