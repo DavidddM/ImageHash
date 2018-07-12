@@ -49,10 +49,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
-            // chooseImageDialog
-            // 
-            this.chooseImageDialog.FileName = "chooseImageDialog";
-            // 
             // saveAsDialog
             // 
             this.saveAsDialog.Filter = "Text files|*.txt|All files|*.*";

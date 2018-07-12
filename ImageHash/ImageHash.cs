@@ -30,9 +30,13 @@ namespace ImageHash
             {
                 try
                 {
-                    Img = new Img(Image.FromFile(chooseImageDialog.FileName));
-                    richTextBox1.Text = binary ? String.Join(Img.BDELIM, Img.ByteArray) : Img.Base64String;
-                    pictureBox1.Image = Img.Image;
+                    richTextBox1.Text = "Loading..";
+                    Thread InitClassThread = new Thread(() => {
+                        Img = new Img(Image.FromFile(chooseImageDialog.FileName));
+                        UpdateRichTextBox(binary ? String.Join(Img.BDELIM, Img.ByteArray) : Img.Base64String);
+                        pictureBox1.Image = Img.Image;
+                    });
+                    InitClassThread.Start();
                 }
                 catch (Exception ex)
                 {
@@ -46,10 +50,14 @@ namespace ImageHash
             {
                 try
                 {
-                    if (binary) Img.SaveByteArray(saveAsDialog.FileName);
-                    else Img.SaveBase64String(saveAsDialog.FileName);
+                    Thread SaveFileThread = new Thread(() =>
+                    {
+                        if (binary) Img.SaveByteArray(saveAsDialog.FileName);
+                        else Img.SaveBase64String(saveAsDialog.FileName);
+                    });
+                    SaveFileThread.Start();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show("An error has occured. Make sure that the image has successfully been loaded.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -61,34 +69,39 @@ namespace ImageHash
             {
                 try
                 {
-                    if (!AutoType)
+                    richTextBox1.Text = "Loading..";
+                    Thread LoadFileThread = new Thread(() =>
                     {
-                        if (binary) { Img = Img.FromByteArray(openFileDialog.FileName); }
-                        else { Img = Img.FromBase64String(openFileDialog.FileName, true); }
-                    }
-                    else
-                    {
-                        using (StreamReader sr = new StreamReader(openFileDialog.FileName))
+                        if (!AutoType)
                         {
-                            string tempStr = sr.ReadToEnd();
-                            if (Img.IsByteArray(tempStr))
+                            if (binary) { Img = Img.FromByteArray(openFileDialog.FileName); }
+                            else { Img = Img.FromBase64String(openFileDialog.FileName, true); }
+                        }
+                        else
+                        {
+                            using (StreamReader sr = new StreamReader(openFileDialog.FileName))
                             {
-                                Img = Img.FromByteArray(Img.FromStringToByteArray(tempStr));
-                                radioButton1.Checked = true;
-                                binary = true;
-                            }
-                            else
-                            {
-                                Img = Img.FromBase64String(tempStr, false);
-                                radioButton2.Checked = true;
-                                binary = false;
+                                string tempStr = sr.ReadToEnd();
+                                if (Img.IsByteArray(tempStr))
+                                {
+                                    Img = Img.FromByteArray(Img.FromStringToByteArray(tempStr));
+                                    radioButton1.Checked = true;
+                                    binary = true;
+                                }
+                                else
+                                {
+                                    Img = Img.FromBase64String(tempStr, false);
+                                    radioButton2.Checked = true;
+                                    binary = false;
+                                }
                             }
                         }
-                    }
-                    pictureBox1.Image = Img.Image;
-                    richTextBox1.Text = binary ? String.Join(Img.BDELIM, Img.ByteArray) : Img.Base64String;
+                        pictureBox1.Image = Img.Image;
+                        UpdateRichTextBox(binary ? String.Join(Img.BDELIM, Img.ByteArray) : Img.Base64String);
+                    });
+                    LoadFileThread.Start();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show("An error has occured. Make sure that you've selected valid file type and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -102,7 +115,7 @@ namespace ImageHash
             if (binary) return;
             binary = true;
             if (richTextBox1.Text.Equals("")) return;
-            richTextBox1.Text = String.Join(Img.BDELIM, Img.ByteArray);
+            UpdateRichTextBox(String.Join(Img.BDELIM, Img.ByteArray));
         }
 
         private void radioButton2_Click(object sender, EventArgs e)
@@ -110,13 +123,20 @@ namespace ImageHash
             if (!binary) return;
             binary = false;
             if (richTextBox1.Text.Equals("")) return;
-            richTextBox1.Text = Img.Base64String;
+            UpdateRichTextBox(Img.Base64String);
         }
         #endregion
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             AutoType = !AutoType;
-        }  
+        }
+
+        public void UpdateRichTextBox(string str)
+        {
+            richTextBox1.ResetText();
+            richTextBox1.Text = "Loading..";
+            richTextBox1.Text = str;
+        }
     }
 }

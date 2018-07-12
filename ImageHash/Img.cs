@@ -62,11 +62,8 @@ namespace ImageHash
 
         private void InitializeByteArray()
         {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                Image.Save(ms, Image.RawFormat);
-                ByteArray = ms.ToArray();
-            }
+            ImageConverter imgCon = new ImageConverter();
+            ByteArray = (byte[])imgCon.ConvertTo(Image, typeof(byte[]));
         }
 
         private void InitializeBase64String()
@@ -83,11 +80,8 @@ namespace ImageHash
         // Loading from byte array while the array itself is passed
         public static Img FromByteArray(byte[] bArr)
         {
-            Image image;
-            using (MemoryStream ms = new MemoryStream(bArr))
-            {
-                image = Image.FromStream(ms);
-            }
+            ImageConverter imgCon = new ImageConverter();
+            Image image = (Image)imgCon.ConvertFrom(bArr);
 
             return new Img(image, bArr);
         }
@@ -100,9 +94,7 @@ namespace ImageHash
             {
                 tempStr = sr.ReadToEnd();
             }
-
             byte[] bArr = Img.FromStringToByteArray(tempStr);
-
             return FromByteArray(bArr);
         }
 
@@ -149,7 +141,7 @@ namespace ImageHash
         {
             foreach (var c in str.Replace(" ", String.Empty))
             {
-                if (!Int32.TryParse(c.ToString(), out int n)) return false;
+                if (!Char.IsDigit(c)) return false;
             }
             return true;
         }
