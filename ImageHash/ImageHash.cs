@@ -15,7 +15,9 @@ namespace ImageHash
 {
     public partial class ImageHash : Form
     {
-        Img Img = new Img(null, null);
+        Img Img = null;
+        public delegate void LogDelegate(string str, bool append = true);
+        public delegate void ProgressBarDelegate(int i);
 
         public ImageHash()
         {
@@ -93,7 +95,6 @@ namespace ImageHash
             Log("", false);
         }
 
-        // gotta completely rewrite this
         private void button4_Click(object sender, EventArgs e)
         {
             string str = null;
@@ -137,7 +138,11 @@ namespace ImageHash
 
         private void button7_Click(object sender, EventArgs e)
         {
-
+            if (Img is null)
+            {
+                Log("Nothing to hash..");
+                return;
+            }
             Thread HashingThread = new Thread(() => { Img.HashBase64String(UpdateProgressBar, Log); });
             HashingThread.Start();
         }
@@ -157,30 +162,54 @@ namespace ImageHash
                 SaveFileThread.Start();
             }
         }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            if (Img is null) return;
+            Img = null;
+            pictureBox1.Image = null;
+            Log("Cleared..");
+        }
         #endregion
 
         #region GUI
         public void Log(string str, bool append = true)
         {
-            if (!append)
+            if (!richTextBox1.InvokeRequired)
             {
-                richTextBox1.Text = str;
+                if (!append)
+                {
+                    richTextBox1.Text = str;
+                }
+                if (append)
+                {
+                    if (!richTextBox1.Text.Equals("")) richTextBox1.Text += "\n" + str;
+                    else Log(str, false);
+                }
             }
-            if (append)
+            else
             {
-                if (!richTextBox1.Text.Equals("")) richTextBox1.Text += "\n" + str;
-                else Log(str, false);
+                LogDelegate LogDeleg = new LogDelegate(Log);
+                richTextBox1.Invoke(LogDeleg, new object [] { str, append });
             }
         }
 
         public void UpdateProgressBar(int i)
         {
-            progressBar1.Value = i;
+            if (!progressBar1.InvokeRequired)
+            {
+                progressBar1.Value = i;
+            }
+            else
+            {
+                ProgressBarDelegate progressBarDeleg = new ProgressBarDelegate(UpdateProgressBar);
+                progressBar1.Invoke(progressBarDeleg, new object[] { i });
+            }
         }
 
         public void ResetProgressBar()
         {
-            progressBar1.Value = 0;
+            UpdateProgressBar(0);
         }
         #endregion
     }

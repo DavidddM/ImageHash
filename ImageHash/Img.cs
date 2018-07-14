@@ -12,7 +12,7 @@ namespace ImageHash
     {
         #region Delegates
         public delegate void CallBackDelegate(int i);
-        public delegate void UpdateGUIDelegate(string str, bool append = true);
+        public delegate void LogDelegate(string str, bool append = true);
         #endregion
 
         #region Properties
@@ -65,15 +65,15 @@ namespace ImageHash
                 sw.Write(Base64String);
             }
         }
-        public void HashBase64String(CallBackDelegate callBack, UpdateGUIDelegate updateGUI)
+        public void HashBase64String(CallBackDelegate callBack, LogDelegate Log)
         {
             if (IsHashed)
             {
-                updateGUI("Base64 string is already hashed..");
+                Log("Base64 string is already hashed..");
                 return;
             }
             IsHashed = true;
-            HashedBase64String = HashString(Base64String, ref Key, callBack, updateGUI);
+            HashedBase64String = HashString(Base64String, ref Key, callBack, Log);
         }
 
         private void InitializeByteArray()
@@ -128,15 +128,18 @@ namespace ImageHash
             return Img.FromByteArray(bArr);
         }
 
-        public static Img FromHashedFile(string str, string stringKey, CallBackDelegate callBack, UpdateGUIDelegate updateGUI)
+        public static Img FromHashedFile(string str, string stringKey, CallBackDelegate callBack, LogDelegate Log)
         {
             string newStr = null;
-            updateGUI("Parsing key..");
+            Log("Parsing key..");
             List<int> key = Img.ParseKey(stringKey, callBack);
-            updateGUI("Key parsed successfully..\nUnhashing the file using the key..");
+            Log("Key parsed successfully..\nUnhashing the file using the key..");
             newStr = Img.Unhash(str, key, callBack);
-            updateGUI("Done");
-            return Img.FromBase64String(newStr, false);
+            Log("Done");
+            Img img = Img.FromBase64String(newStr, false);
+            img.IsHashed = true;
+            img.HashedBase64String = newStr;
+            return img;
         }
 
         // Shuffle list; Not completely random, but fastest way
@@ -162,11 +165,11 @@ namespace ImageHash
         }
 
         // Hash string and generate it's key
-        static string HashString(string str, ref List<int> key, CallBackDelegate callBack, UpdateGUIDelegate updateGUI)
+        static string HashString(string str, ref List<int> key, CallBackDelegate callBack, LogDelegate Log)
         {
-            updateGUI("Generating key..");
+            Log("Generating key..");
             key = ShuffleList(Enumerable.Range(0, str.Length).ToList(), callBack);
-            updateGUI("Key generated..\nHashing image..");
+            Log("Key generated..\nHashing image..");
             char[] tempCArr = new char[str.Length];
             int cb = 0;
             callBack(cb);
@@ -180,7 +183,7 @@ namespace ImageHash
                     callBack(cb);
                 }
             }
-            updateGUI("Image hashed sucessfully..");
+            Log("Image hashed sucessfully..");
             return new string(tempCArr); ;
         }
 
