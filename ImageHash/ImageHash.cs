@@ -35,7 +35,7 @@ namespace ImageHash
                         Img = new Img(Image.FromFile(chooseImageDialog.FileName));
                         pictureBox1.Image = Img.Image;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         MessageBox.Show("An error has occured. Make sure that you've selected valid file and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -55,7 +55,7 @@ namespace ImageHash
                     {
                         Img.SaveBase64String(saveAsDialog.FileName);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         MessageBox.Show("An error has occured. Make sure that the image has successfully been loaded.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
@@ -78,7 +78,7 @@ namespace ImageHash
                         Log("File loaded successfully..");
                         pictureBox1.Image = Img.Image;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         MessageBox.Show("An error has occured. Make sure that you've selected valid file type and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         Log("", false);
@@ -122,7 +122,7 @@ namespace ImageHash
                             Img = Img.FromHashedFile(str, key, UpdateProgressBar, Log);
                             pictureBox1.Image = Img.Image;
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             MessageBox.Show("An error has occured. Make sure that you've selected valid file type and try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             Log("", false);

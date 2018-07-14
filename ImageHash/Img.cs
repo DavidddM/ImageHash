@@ -58,15 +58,6 @@ namespace ImageHash
             sw.Close();
         }
 
-
-        public void SaveByteArray(string fileName)
-        {
-            using (StreamWriter sw = new StreamWriter(fileName))
-            {
-                sw.Write(String.Join(Img.BDELIM, ByteArray));
-            }
-        }
-
         public void SaveBase64String(string fileName)
         {
             using (StreamWriter sw = new StreamWriter(fileName))
@@ -105,24 +96,12 @@ namespace ImageHash
         #region Static Methods
         // Static methods
         // Loading from byte array while the array itself is passed
-        public static Img FromByteArray(byte[] bArr)
+        private static Img FromByteArray(byte[] bArr)
         {
             ImageConverter imgCon = new ImageConverter();
             Image image = (Image)imgCon.ConvertFrom(bArr);
 
             return new Img(image);
-        }
-
-        // Loading from byte array using file path
-        public static Img FromByteArray(string filePath, CallBackDelegate callBack)
-        {
-            string tempStr = null;
-            using (StreamReader sr = new StreamReader(filePath))
-            {
-                tempStr = sr.ReadToEnd();
-            }
-            byte[] bArr = Img.FromStringToByteArray(tempStr, callBack);
-            return FromByteArray(bArr);
         }
 
         // Loading from Base64 string. Since Base64 string and file path are both the same type, method cannot be overloaded
@@ -158,37 +137,6 @@ namespace ImageHash
             newStr = Img.Unhash(str, key, callBack);
             updateGUI("Done");
             return Img.FromBase64String(newStr, false);
-        }
-
-        // Split string by delimeter and convert it to byte array
-        public static byte[] FromStringToByteArray(string str, CallBackDelegate callBack)
-        {
-            string[] sArr = str.Split(BDELIM.ToCharArray());
-            byte[] bArr = new byte[str.Length];
-            
-            
-            int cb = 0;
-            for (int i = 0, j=0; i < sArr.Length; i++, j++)
-            {
-                bArr[i] = Convert.ToByte(sArr[i]);
-                if(sArr.Length/100 ==j)
-                {
-                    j = 0;
-                    cb++;
-                    callBack(cb);
-                }
-            }
-            return bArr;
-        }
-
-        // Check is given string is byte array or not
-        public static bool IsByteArray(string str)
-        {
-            foreach (var c in str.Replace(" ", String.Empty))
-            {
-                if (!Char.IsDigit(c)) return false;
-            }
-            return true;
         }
 
         // Shuffle list; Not completely random, but fastest way
